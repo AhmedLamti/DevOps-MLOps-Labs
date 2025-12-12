@@ -1,0 +1,55 @@
+name: CI Pipeline
+
+# 1. Trigger: Run on push and pull_request
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # --- Étape A : Checkout du code ---
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # --- Étape B : Setup Python ---
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    # --- Étape C : Installation des dépendances ---
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # --- Étape D : Run Linter (Flake8) ---
+    - name: Run Linter (Flake8)
+      run: |
+        flake8
+
+    # --- Étape E : Run Tests (Pytest) ---
+    - name: Run Tests
+      run: |
+        python -m pytest
+
+    # --- Étape F : Build Docker Image ---
+    # Note: Cela nécessite qu'un "Dockerfile" existe à la racine
+    - name: Build Docker image
+      run: docker build -t ml-app:latest .
+
+    # --- Étape G : Save Docker Image as Artifact ---
+    # On sauvegarde l'image dans un fichier .tar pour pouvoir l'uploader
+    - name: Save Docker image to file
+      run: docker save ml-app:latest > ml-app-image.tar
+
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ml-app-docker-image
+        path: ml-app-image.tar

@@ -1,0 +1,16 @@
+[flake8]
+# Exclure les dossiers inutiles (comme l'environnement virtuel et le cache)
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    build,
+    dist
+
+# Longueur de ligne maximale (Black utilise 88 par défaut, 120 est aussi courant)
+max-line-length = 88
+
+# Ignorer certaines erreurs mineures si nécessaire
+# E203: Whitespace before ':' (conflit parfois avec Black)
+# W503: Line break before binary operator (obsolète)
+extend-ignore = E203, W503
